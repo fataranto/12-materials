@@ -1,11 +1,20 @@
 import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import * as dat from 'dat.gui'
+
+
+/**
+ * Debug
+ */
+const gui = new dat.GUI()
+
 
 /**
  * Textures
  */
 const textureLoader = new THREE.TextureLoader()
+const cubeTextureLoader = new THREE.CubeTextureLoader()
 
 const doorColorTexture = textureLoader.load('/textures/door/color.jpg')
 const doorAlphaTexture = textureLoader.load('/textures/door/alpha.jpg')
@@ -14,8 +23,17 @@ const doorHeightTexture = textureLoader.load('/textures/door/height.jpg')
 const doorNormalTexture = textureLoader.load('/textures/door/normal.jpg')
 const doorMetalnessTexture = textureLoader.load('/textures/door/metalness.jpg')
 const doorRoughnessTexture = textureLoader.load('/textures/door/roughness.jpg')
-const matcapTexture = textureLoader.load('/textures/matcaps/1.png')
+const matcapTexture = textureLoader.load('/textures/matcaps/3.png')
 const gradientTexture = textureLoader.load('/textures/gradients/3.jpg')
+
+const environmentMapTexture = cubeTextureLoader.load([
+    '/textures/environmentMaps/3/px.jpg',
+    '/textures/environmentMaps/3/nx.jpg',
+    '/textures/environmentMaps/3/py.jpg',
+    '/textures/environmentMaps/3/ny.jpg',
+    '/textures/environmentMaps/3/pz.jpg',
+    '/textures/environmentMaps/3/pz.jpg'
+])
 
 
 
@@ -35,14 +53,41 @@ const scene = new THREE.Scene()
 /**
  * Objects
  */
-const material = new THREE.MeshBasicMaterial()
+//const material = new THREE.MeshBasicMaterial()
 //material.map = doorColorTexture
-material.color = new THREE.Color("blue")
+//material.color = new THREE.Color("blue")
 //material.wireframe = true
-material.opacity = 0.5
-material.transparent = true //van juntos con opacity
-material.alphaMap = doorAlphaTexture
-material.side = THREE.DoubleSide
+//material.opacity = 0.5
+//material.transparent = true //van juntos con opacity y también con alphaMap
+//material.alphaMap = doorAlphaTexture
+//material.side = THREE.DoubleSide //para mostrar el reverso de un plano
+
+//const material = new THREE.MeshNormalMaterial()
+//material.flatShading = true
+
+
+//const material = new THREE.MeshMatcapMaterial()
+//material.matcap = matcapTexture
+
+//const material = new THREE.MeshDepthMaterial()
+
+//const material = new THREE.MeshLambertMaterial()
+
+//const material = new THREE.MeshPhongMaterial()
+//material.shininess = 500
+//material.specular = new THREE.Color(0xff0000)
+
+//const material = new THREE.MeshToonMaterial()
+//material.gradientMap = gradientTexture
+
+const material = new THREE.MeshStandardMaterial()
+material.metalness = 0.7
+material.roughness = 0.2
+//material.map = doorColorTexture
+material.envMap = environmentMapTexture
+
+gui.add(material, 'metalness').min(0).max(1).step(0.0001)
+gui.add(material, 'roughness').min(0).max(1).step(0.0001)
 
 const sphere = new THREE.Mesh(
     new THREE.SphereGeometry(0.5, 16, 16),
@@ -64,6 +109,23 @@ const torus = new THREE.Mesh(
 torus.position.x = 1.5
 
 scene.add(sphere, plane, torus)
+
+
+/**
+ * Lights
+ */
+
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
+scene.add(ambientLight)
+
+const pointLight = new THREE.PointLight(0xffffff, 0.5)
+pointLight.position.x = 2
+pointLight.position.y = 3
+pointLight.position.z = 4
+scene.add(pointLight)
+
+
+
 /**
  * Sizes
  */
